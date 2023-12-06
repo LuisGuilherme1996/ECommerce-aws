@@ -2,6 +2,8 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { ECommerceAwsStack } from '../lib/e_commerce_aws-stack';
+import { ProductStack } from 'aws-cdk-lib/aws-servicecatalog';
+import { ProductsAppStack } from '../lib/productsApp-stack';
 
 const app = new cdk.App();
 new ECommerceAwsStack(app, 'ECommerceAwsStack', {
