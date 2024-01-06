@@ -1,5 +1,10 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult, Context} from "aws-lambda";
+import { ProductsRepository } from "./layers/productsLayer/nodejs/productsRepository";
+import {DynamoDB} from "aws-sdk";
 
+const productsDdb = process.env.PRODUCTS_DDB
+const ddbClient = new DynamoDB.DocumentClient()
+const productsRepository = new ProductsRepository(ddbClient, productsDdb)
 export async function handler(event: APIGatewayProxyEvent, context: Context): Promise<APIGatewayProxyResult> {
     try {
         const lambdaRequestId = context.awsRequestId;
@@ -9,12 +14,29 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
         if (event.resource === "/products") {
             if (method === "GET") {
                 console.log("GET");
+                const products = await productsRepository.getAllProducts();
                 return {
                     statusCode: 200,
-                    body: JSON.stringify({
-                        message: "GET PRODUCTS - OK"
-                    })
+                    body: JSON.stringify(products)
+
                 };
+            }
+        } else if (event.resource === "/products/{id}") {
+            const id = event.pathParameters?.id as string;
+            console.log(`CHAMOU GET ID::::> ${id}`)
+            try{
+                const productById = await productsRepository.getProductById(id);
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify(productById)
+                };
+
+            }catch(err){
+               
+                return {
+                    statusCode: 404,
+                    body: (<Error>err).message
+                }
             }
         }
         return {

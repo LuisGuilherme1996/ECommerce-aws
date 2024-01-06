@@ -13,6 +13,10 @@ export class ECommerceApiStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, 'ECommerceApi', {
         restApiName: "ECommerceApi",
         cloudWatchRole: true,
+        defaultCorsPreflightOptions: {
+            allowOrigins: apigateway.Cors.ALL_ORIGINS,
+            allowMethods: apigateway.Cors.ALL_METHODS
+        },
         deployOptions: {
             accessLogDestination: new apigateway.LogGroupLogDestination(logGroup),
             accessLogFormat: apigateway.AccessLogFormat.jsonWithStandardFields({
@@ -30,8 +34,22 @@ export class ECommerceApiStack extends cdk.Stack {
         }
     })
     const productsFetchIntegration = new apigateway.LambdaIntegration(props.productsFetchHandler)
-
+    // "/products"
     const productsResource = api.root.addResource('products')
-    productsResource.addMethod('GET', productsFetchIntegration) 
+    productsResource.addMethod('GET', productsFetchIntegration)
+
+    // "/products/{id}"
+    const productsIdResource = productsResource.addResource('{id}');
+    productsIdResource.addMethod('GET', productsFetchIntegration);
+
+    const productsAdminIntegration = new apigateway.LambdaIntegration(props.productsAdminHandler);
+    //POST "/products"
+    productsResource.addMethod('POST', productsAdminIntegration);
+    
+    //PUT "/products/{id}"
+    productsIdResource.addMethod('PUT', productsAdminIntegration);
+
+    //DELETE "/products/{id}"
+    productsIdResource.addMethod('DELETE', productsAdminIntegration);
     }
 }

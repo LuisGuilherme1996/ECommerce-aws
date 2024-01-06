@@ -10,8 +10,18 @@
     "esModuleInterop": true, 
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true, 
-    "isolatedModules": true, 
+    "isolatedModules": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
+    "baseUrl": "./",
+    "paths": {
+      "ProductsRepository":[
+        "lambda/products/layers/productsLayer/nodejs/productRepository"
+      ]
+    }
   },
+
   "exclude": [
     "node_modules",
     "cdk.out"
