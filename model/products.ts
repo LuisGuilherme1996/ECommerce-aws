@@ -4,4 +4,5 @@ export interface Product {
     code: string
     price: number
     model: string
+    productUrl: string
 }
